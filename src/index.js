@@ -1,1 +1,3 @@
-console.log("Hello")
+import { stream } from "./utils/streamUtils.js";
+
+stream()

@@ -16,46 +16,47 @@ export const stream = async () => {
     greetTheUser(getNameUser());
     showDirectory();
 
-    rl.on("line", (input) => {
+    rl.on("line", async (input) => {
       const trimmedInput = input.trim().toLowerCase();
       if (trimmedInput === ".exit") {
-        takeLeaveOf(exit);
+        await takeLeaveOf(exit);
         return;
       }
-      const eventLength = trimmedInput.split(" ").length;
-      const args = trimmedInput.split(" ");
-      const command = args[0];
-      const eventHandler = occurrence[command];
+      let [cmd, ...args] = trimmedInput.split(" ");
+      if (/"|'/g.test(args)) {
+        args = args
+          .join(" ")
+          .split(/["'] | ["']/)
+          .map((arg) => arg.replace(/"|'/g, ""));
+      }
+      const eventHandler = occurrence[cmd];
 
-      switch (eventLength) {
+      if (!eventHandler) {
+        console.log("Invalid input");
+        return;
+      }
+
+      switch (args.length) {
+        case 0:
+          await eventHandler();
+          break;
         case 1:
-          if (command in occurrence) {
-            eventHandler();
-            showDirectory();
-          }
-          break;
-        case 2:
-          if (command in occurrence) {
-            eventHandler(args[1]);
-            showDirectory();
-          }
-          break;
-        case 2:
-          if (command in occurrence) {
-            eventHandler(args[1], args[2]);
-            showDirectory();
-          }
+          await eventHandler(args);
           break;
 
         default:
-          false;
-          break;
+          console.log("Invalid input");
+          return;
       }
+
+      await showDirectory();
     });
-    rl.on("SIGINT", () => {
-      takeLeaveOf(exit);
+
+    rl.on("SIGINT", async () => {
+      await takeLeaveOf(exit);
     });
   } catch (error) {
     console.error("FS operation failed");
+    console.log(error.message);
   }
 };

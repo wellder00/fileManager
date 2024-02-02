@@ -23,12 +23,10 @@ export const showList = async () => {
       }),
     );
     detailedList.sort((a, b) => {
-      if (a.Type === "directory" && b.Type === "file") {
-        return -1;
-      } else if (a.Type === "file" && b.Type === "directory") {
-        return 1;
+      if (a.Type !== b.Type) {
+        return a.Type.localeCompare(b.Type);
       } else {
-        return 0;
+        return a.Name.localeCompare(b.Name);
       }
     });
 
@@ -38,7 +36,7 @@ export const showList = async () => {
   }
 };
 
-export const moveToDir = (directoryPath) => {
+export const moveToDir = ([directoryPath] = "") => {
   try {
     process.chdir(directoryPath);
   } catch (error) {

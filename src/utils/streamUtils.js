@@ -3,9 +3,10 @@ import { exit, stdin, stdout } from "process";
 import { getNameUser } from "./cliUtils.js";
 import { greetTheUser } from "../controllers/userController.js";
 import { showDirectory } from "../controllers/currentDirectory.js";
-import { occurrence } from "../data/events.js";
+import { occurrence, osInfo } from "../data/events.js";
 import { takeLeaveOf } from "../services/userService.js";
 import { changeQuotes } from "../utils/regForSpace.js";
+import { consoleColors } from "../config/constants.js";
 
 export const stream = async () => {
   const rl = readline.createInterface({
@@ -27,15 +28,23 @@ export const stream = async () => {
       if (/"|'/g.test(args)) {
         args = changeQuotes(args);
       }
-      const eventHandler = occurrence[cmd];
 
-      if (!eventHandler) {
-        console.log("Invalid input");
-        return;
+      if (cmd === "os") {
+        try {
+          const argKey = args.join();
+          osInfo[argKey]();
+        } catch (error) {
+          console.log(consoleColors.red, "Invalid input");
+        }
+      } else {
+        if (!occurrence[cmd]) {
+          console.log(consoleColors.red, "Invalid input");
+          return;
+        }
+        args.length >= 0 && args.length <= 2
+          ? await occurrence[cmd](args)
+          : console.log(consoleColors.red, "Invalid input");
       }
-      args.length >= 0 && args.length <= 2
-        ? await eventHandler(args)
-        : console.log("Invalid input");
 
       await showDirectory();
     });
@@ -44,7 +53,7 @@ export const stream = async () => {
       await takeLeaveOf(exit);
     });
   } catch (error) {
-    console.error("FS operation failed");
+    console.error(consoleColors.red, "FS operation failed");
     console.log(error.message);
   }
 };

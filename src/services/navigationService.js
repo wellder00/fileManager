@@ -1,12 +1,13 @@
 import path from "path";
 import fs from "fs/promises";
 import { errMessage } from "../config/constants.js";
+import { consoleColors } from "../config/constants.js";
 
 export const moveUp = () => {
   try {
     process.chdir("..");
   } catch (error) {
-    console.error(errMessage);
+    console.error(consoleColors.red, errMessage);
   }
 };
 
@@ -32,7 +33,7 @@ export const showList = async () => {
 
     console.table(detailedList);
   } catch (error) {
-    console.error(errMessage);
+    console.error(consoleColors.red, errMessage);
   }
 };
 
@@ -40,6 +41,6 @@ export const moveToDir = ([directoryPath] = "") => {
   try {
     process.chdir(directoryPath);
   } catch (error) {
-    console.error(errMessage);
+    console.error(consoleColors.red, errMessage);
   }
 };

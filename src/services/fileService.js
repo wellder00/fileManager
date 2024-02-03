@@ -3,6 +3,8 @@ import * as fsPromises from "fs/promises";
 import path from "path";
 
 import { errMessage } from "../config/constants.js";
+import { consoleColors } from "../config/constants.js";
+import { checkFileAccessibility } from "../utils/isAccess.js";
 
 export const printFileContent = ([filePath]) => {
   try {
@@ -12,10 +14,10 @@ export const printFileContent = ([filePath]) => {
     });
 
     readableStream.on("error", () => {
-      console.error("Error reading file");
+      console.error(consoleColors.red, "Error reading file");
     });
   } catch (error) {
-    console.error(errMessage);
+    console.error(consoleColors.red, errMessage);
   }
 };
 
@@ -25,7 +27,7 @@ export const printFileContentAsync = async ([filePath]) => {
     const fileContent = await fsPromises.readFile(filePath, { encoding: "utf8" });
     console.log(fileContent);
   } catch (error) {
-    console.error(errMessage);
+    console.error(consoleColors.red, errMessage);
   }
 };
 
@@ -37,7 +39,7 @@ export const addFile = async ([fileName]) => {
 
     console.log(`Empty file "${fileName}" created successfully.`);
   } catch (error) {
-    console.error(errMessage);
+    console.error(consoleColors.red, errMessage);
   }
 };
 
@@ -48,7 +50,7 @@ export const renameFile = async ([oldName, newName]) => {
     await fsPromises.rename(oldPath, newPath);
     console.log(`File "${oldName}" renamed to "${newName}" successfully.`);
   } catch (error) {
-    console.error(errMessage);
+    console.error(consoleColors.red, errMessage);
   }
 };
 
@@ -64,31 +66,30 @@ export const copyFile = ([sourcePath, destinationDirectory]) => {
     const writableStream = fs.createWriteStream(destinationPath);
 
     readableStream.on("error", (error) => {
-      console.error(errMessage);
+      console.error(consoleColors.red, errMessage);
     });
 
     writableStream.on("error", (error) => {
-      console.error(errMessage);
+      console.error(consoleColors.red, errMessage);
     });
 
     readableStream.pipe(writableStream);
 
     writableStream.on("finish", () => {
-      console.log(`File copied successfully to ${destinationPath}`);
+      console.log(consoleColors.green, `File copied successfully to ${destinationPath}`);
     });
   } catch (error) {
-    console.error(errMessage);
+    console.error(consoleColors.red, errMessage);
   }
 };
 
 export const moveFile = async ([sourcePath, destinationDirectory]) => {
   const sourceFileName = path.basename(sourcePath);
-  console.log(sourcePath);
-  console.log(destinationDirectory);
   try {
-    if (!destinationDirectory) {
-      throw new Error(`Destination directory is not provided. ${destinationDirectory}`);
-    }
+    await Promise.all([
+      checkFileAccessibility(sourcePath),
+      checkFileAccessibility(destinationDirectory),
+    ]);
 
     const destinationPath = path.join(destinationDirectory, sourceFileName);
 
@@ -104,9 +105,12 @@ export const moveFile = async ([sourcePath, destinationDirectory]) => {
 
     await fsPromises.unlink(sourcePath);
 
-    console.log(`File '${sourceFileName}' moved successfully to '${destinationDirectory}'.`);
+    console.log(
+      consoleColors.green,
+      `File '${sourceFileName}' moved successfully to '${destinationDirectory}'.`,
+    );
   } catch (error) {
-    console.error(errMessage);
+    console.error(consoleColors.red, errMessage);
   }
 };
 
@@ -123,8 +127,8 @@ export const removeFile = async ([pathToRemoveFile]) => {
     }
 
     await fsPromises.unlink(filePath);
-    console.log(`File '${pathToRemoveFile}' removed.`);
+    console.log(consoleColors.green, `File '${pathToRemoveFile}' removed.`);
   } catch (error) {
-    console.error(errMessage);
+    console.error(consoleColors.red, errMessage);
   }
 };

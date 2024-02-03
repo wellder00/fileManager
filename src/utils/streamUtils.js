@@ -5,6 +5,7 @@ import { greetTheUser } from "../controllers/userController.js";
 import { showDirectory } from "../controllers/currentDirectory.js";
 import { occurrence } from "../data/events.js";
 import { takeLeaveOf } from "../services/userService.js";
+import { changeQuotes } from "../utils/regForSpace.js";
 
 export const stream = async () => {
   const rl = readline.createInterface({
@@ -24,10 +25,7 @@ export const stream = async () => {
       }
       let [cmd, ...args] = trimmedInput.split(" ");
       if (/"|'/g.test(args)) {
-        args = args
-          .join(" ")
-          .split(/["'] | ["']/)
-          .map((arg) => arg.replace(/"|'/g, ""));
+        args = changeQuotes(args);
       }
       const eventHandler = occurrence[cmd];
 
@@ -35,19 +33,9 @@ export const stream = async () => {
         console.log("Invalid input");
         return;
       }
-
-      switch (args.length) {
-        case 0:
-          await eventHandler();
-          break;
-        case 1:
-          await eventHandler(args);
-          break;
-
-        default:
-          console.log("Invalid input");
-          return;
-      }
+      args.length >= 0 && args.length <= 2
+        ? await eventHandler(args)
+        : console.log("Invalid input");
 
       await showDirectory();
     });

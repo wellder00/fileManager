@@ -3,16 +3,18 @@ import fs from "fs/promises";
 import { errMessage } from "../config/constants.js";
 import { consoleColors } from "../config/constants.js";
 
-export const moveUp = () => {
+export const moveUp = ([arg]) => {
   try {
+    if (arg) throw new Error();
     process.chdir("..");
   } catch (error) {
     console.error(consoleColors.red, errMessage);
   }
 };
 
-export const showList = async () => {
+export const showList = async ([arg]) => {
   try {
+    if (arg) throw new Error();
     const filesList = await fs.readdir(path.resolve(process.cwd()));
     const detailedList = await Promise.all(
       filesList.map(async (file) => {

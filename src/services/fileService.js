@@ -22,14 +22,14 @@ export const printFileContent = ([filePath]) => {
 };
 
 // Another example realization cat function
-export const printFileContentAsync = async ([filePath]) => {
-  try {
-    const fileContent = await fsPromises.readFile(filePath, { encoding: "utf8" });
-    console.log(fileContent);
-  } catch (error) {
-    console.error(consoleColors.red, errMessage);
-  }
-};
+// export const printFileContentAsync = async ([filePath]) => {
+//   try {
+//     const fileContent = await fsPromises.readFile(filePath, { encoding: "utf8" });
+//     console.log(fileContent);
+//   } catch (error) {
+//     console.error(consoleColors.red, errMessage);
+//   }
+// };
 
 export const addFile = async ([fileName]) => {
   try {
@@ -82,6 +82,43 @@ export const copyFile = ([sourcePath, destinationDirectory]) => {
     console.error(consoleColors.red, errMessage);
   }
 };
+
+
+// Another example realization cp function
+// const copyFile = async ([sourcePath, destinationDirectory]) => {
+//   try {
+//     if (!destinationDirectory) {
+//       throw new Error(`Destination directory is not provided. ${destinationDirectory}`);
+//     }
+//     const sourceFileName = path.basename(sourcePath);
+//     const destinationPath = path.join(destinationDirectory, sourceFileName);
+
+//     const readableStream = fs.createReadStream(sourcePath);
+//     const writableStream = fs.createWriteStream(destinationPath);
+
+//     await new Promise((resolve, reject) => {
+//       readableStream.on("error", (error) => {
+//         console.error(consoleColors.red, error);
+//         reject(error);
+//       });
+
+//       writableStream.on("error", (error) => {
+//         console.error(consoleColors.red, error);
+//         reject(error);
+//       });
+
+//       writableStream.on("finish", () => {
+//         console.log(consoleColors.green, `File copied successfully to ${destinationPath}`);
+//         resolve();
+//       });
+
+//       readableStream.pipe(writableStream);
+//     });
+//   } catch (error) {
+//     console.error(consoleColors.red, error);
+//   }
+// };
+
 
 export const moveFile = async ([sourcePath, destinationDirectory]) => {
   const sourceFileName = path.basename(sourcePath);

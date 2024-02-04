@@ -15,13 +15,12 @@ export const moveUp = ([arg]) => {
 export const showList = async ([arg]) => {
   try {
     if (arg) throw new Error();
-    const filesList = await fs.readdir(path.resolve(process.cwd()));
+    const filesList = await fs.readdir(path.resolve(process.cwd()), { withFileTypes: true });
     const detailedList = await Promise.all(
       filesList.map(async (file) => {
-        const stats = await fs.stat(path.join(process.cwd(), file));
         return {
-          Name: file,
-          Type: stats.isFile() ? "file" : "directory",
+          Name: file.name,
+          Type: file.isFile() ? "file" : "directory",
         };
       }),
     );
